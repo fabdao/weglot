@@ -13,6 +13,7 @@
   "license": "ISC",
   "type": "module",
   "dependencies": {
+    "prompt": "^1.1.0",
     "prompt-sync": "^4.2.0"
   }
 }
