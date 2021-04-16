@@ -1,6 +1,6 @@
 
 
-import { parseFileIntoWeeklyObject, reduceIntersecWeek,sortWeekByAscStartTime, writeResult } from './src/fileParser.js';
+import { parseFileIntoWeeklyObject,sortWeekByAscStartTime, writeResult } from './src/fileParser.js';
 import { findTimeSlot } from './src/findTimeSlot.js';
 import { convertObjectToTimeSlot } from "./src/timeConverter.js";
 import {  createInterface } from 'readline';
@@ -13,20 +13,17 @@ const rl = createInterface({
 let indexFile = 1;
 
 rl.question('Witch input file do you wanna read ? (number between 1 and 5 expected...)\n', (answer) => {
-    console.warn(`If output${answer}.txt already exist in the data/generated folder, your PC will explose... Mouhahahahaha...`);
+    console.warn(`File named output${answer}.txt should be generated into the data/generated folder... Mouhahahahaha...`);
     indexFile = Number(answer);
 
     parseFileIntoWeeklyObject(indexFile).then(data => {
-
-        console.log(data);
-
-        let parsedWeek = reduceIntersecWeek(data);
+        let parsedWeek = sortWeekByAscStartTime(data);
         let timeSlot = findTimeSlot(parsedWeek);
 
         writeResult(indexFile, timeSlot.foundDay + ' ' + convertObjectToTimeSlot(timeSlot.foundTimeSlot))
-        .then(() =>{
-            console.log(timeSlot.foundDay + ' ' + convertObjectToTimeSlot(timeSlot.foundTimeSlot))
-        });
+         .then(() =>{
+             console.log(timeSlot.foundDay + ' ' + convertObjectToTimeSlot(timeSlot.foundTimeSlot))
+         });
     });
 
     rl.close();

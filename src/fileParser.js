@@ -46,107 +46,11 @@ export async function parseFileIntoWeeklyObject(indexFile)
 //Sort ascending time slots by start time for each days
 export function sortWeekByAscStartTime(pWeek)
 {
-    let debug = 0;
-
     for (let iDay = 1; iDay <= 5; iDay++)
     {
-        for (let yStart = 0; yStart < pWeek[iDay].length-1; yStart++)
-        {
-            if (pWeek[iDay][yStart].start > pWeek[iDay][yStart+1].start)
-            {
-                pWeek[iDay].unshift(pWeek[iDay].splice(yStart+1, 1)[0]);
-                yStart = -1;
-            }
-            debug++;
-            console.info(debug);
-        }
+        pWeek[iDay].sort((a, b) => a.start - b.start);
     }
     return pWeek;
-}
-
-//Sort ascending time slots by start time for each days
-export function reduceIntersecWeek(pWeek, pTokenExit = 0)
-{
-    let iWeek = {
-        1 : [],
-        2 : [],
-        3 : [],
-        4 : [],
-        5 : []
-    };
-
-    let tokenExit = 0;
-
-    for (let iDay = 1; iDay <= 5; iDay++)
-    {
-        if ( pWeek[iDay].length !== 0 )
-        {
-            for (let yStart = 0; yStart < pWeek[iDay].length; yStart++)
-            {
-                if ( iWeek[iDay].length === 0)
-                {
-                    iWeek[iDay].push(pWeek[iDay][yStart]);
-                    tokenExit++;
-                }
-                else
-                {
-                    for (let zStart = 0; zStart < iWeek[iDay].length; zStart++)
-                    {
-                        //Longer
-                        if (pWeek[iDay][yStart].start < iWeek[iDay][zStart].start && pWeek[iDay][yStart].end > iWeek[iDay][zStart].end)
-                        {
-                            iWeek[iDay][zStart] = pWeek[iDay][yStart];
-                            pWeek[iDay].splice(yStart, 1);
-                            zStart = 0;
-                            tokenExit++;
-                            break;
-                        }
-
-                        //Shorter
-                        if (pWeek[iDay][yStart].start > iWeek[iDay][zStart].start && pWeek[iDay][yStart].end < iWeek[iDay][zStart].end)
-                        {
-                            pWeek[iDay].splice(yStart, 1);
-                            zStart = 0;
-                            tokenExit++;
-                            break;
-                        }
-
-                        //Earlier
-                        if (pWeek[iDay][yStart].start < iWeek[iDay][zStart].start && pWeek[iDay][yStart].end > iWeek[iDay][zStart].start)
-                        {
-                            iWeek[iDay][zStart].start = pWeek[iDay][yStart].start;
-                            pWeek[iDay].splice(yStart, 1);
-                            zStart = 0;
-                            tokenExit++;
-                            break;
-                        }
-                        //Later
-                        if(pWeek[iDay][yStart].end > iWeek[iDay][zStart].end && pWeek[iDay][yStart].start < iWeek[iDay][zStart].end)
-                        {
-                            iWeek[iDay][zStart].end = pWeek[iDay][yStart].end;
-                            pWeek[iDay].splice(yStart, 1);
-                            zStart = 0;
-                            tokenExit++;
-                            break;
-                        }
-
-                        //New slot
-                        if (( pWeek[iDay][yStart].start > iWeek[iDay][zStart].end || pWeek[iDay][yStart].end < iWeek[iDay][zStart].start ))
-                        {
-                            iWeek[iDay].push(pWeek[iDay].splice(yStart, 1)[0]);
-                            yStart = 0;
-                            zStart = 0;
-                            tokenExit++;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    if ( tokenExit === pTokenExit ) return iWeek;
-    else return reduceIntersecWeek(iWeek, tokenExit);
 }
 
 export async function writeResult (indexFile, result)
